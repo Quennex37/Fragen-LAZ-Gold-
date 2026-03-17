@@ -2,8 +2,8 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Feuerwehr Quiz - Mobile Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Feuerwehr Quiz Mobile</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -23,52 +23,61 @@
             --btn-secondary: #555;
         }
 
-        * { box-sizing: border-box; transition: background 0.3s, color 0.3s; }
-        body { font-family: sans-serif; line-height: 1.4; padding: 10px; background: var(--bg-color); color: var(--text-color); margin: 0; }
-        .container { max-width: 500px; margin: auto; background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { color: #d32f2f; margin-top: 0; text-align: center; font-size: 1.5em; }
-        .progress { font-size: 0.9em; color: #666; margin-bottom: 10px; font-weight: bold; }
-        .question-text { font-weight: bold; margin-bottom: 15px; display: block; font-size: 1.1em; white-space: pre-wrap; }
-        .option { display: block; background: var(--bg-color); margin-bottom: 8px; padding: 12px 10px 12px 45px; border-radius: 8px; cursor: pointer; position: relative; border: 1px solid var(--border-color); min-height: 45px; }
-        .option input { position: absolute; left: 12px; top: 12px; width: 22px; height: 22px; }
-        button { background: #d32f2f; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 10px; }
-        .part-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .part-row-tri { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
-        .menu-btn { background: var(--btn-secondary); margin-bottom: 0; font-size: 0.85em; padding: 12px 5px; }
-        .exam-btn { background: #e67e22 !important; margin-top: 5px; }
-        #feedback { margin-top: 15px; padding: 12px; border-radius: 6px; display: none; font-weight: bold; text-align: center; }
-        .correct { background: #d4edda; color: #155724; }
-        .wrong { background: #f8d7da; color: #721c24; }
-        #next-btn { background: #28a745; display: none; }
-        .leaderboard { margin-top: 20px; background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); }
-        .entry { padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85em; }
-        .score-info { color: #888; margin-top: 4px; display: block; font-size: 0.82em; line-height: 1.3; }
-        .score-bold { font-weight: bold; color: #d32f2f; display: block; margin-top: 4px; }
-        .cat-label { font-weight: bold; margin-top: 15px; display: block; color: #d32f2f; font-size: 0.9em; }
-        .result-card { text-align: center; padding: 15px; border: 2px solid #d32f2f; border-radius: 10px; background: var(--card-bg); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: background 0.3s; }
+        body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.4; padding: 10px; background: var(--bg-color); color: var(--text-color); margin: 0; overflow-x: hidden; }
+        
+        /* Mobile Container */
+        .container { max-width: 480px; margin: auto; background: var(--card-bg); padding: 15px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        
+        h2 { color: #d32f2f; margin-top: 0; text-align: center; font-size: 1.4em; }
+        .progress { font-size: 0.85em; color: #777; margin-bottom: 10px; font-weight: bold; text-align: center; }
+        
+        /* Fragen Ansicht */
+        .question-text { font-weight: bold; margin-bottom: 15px; display: block; font-size: 1.1em; line-height: 1.3; }
+        .option { display: block; background: var(--bg-color); margin-bottom: 10px; padding: 15px 10px 15px 45px; border-radius: 10px; cursor: pointer; position: relative; border: 1px solid var(--border-color); min-height: 50px; font-size: 0.95em; }
+        .option input { position: absolute; left: 12px; top: 14px; width: 22px; height: 22px; }
+        
+        /* Buttons */
+        button { background: #d32f2f; color: white; border: none; padding: 16px; border-radius: 10px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        .part-row-tri { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+        .part-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .menu-btn { background: var(--btn-secondary); font-size: 0.85em; padding: 12px 2px; }
+        .exam-btn { background: #e67e22 !important; margin-top: 2px; margin-bottom: 12px; }
+        
+        /* Feedback */
+        #feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; font-weight: bold; text-align: center; }
+        .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .wrong { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        
+        /* Rankings */
+        .leaderboard { margin-top: 15px; background: var(--bg-color); padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); }
+        .entry { padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85em; }
+        .score-info { color: #888; display: block; font-size: 0.8em; margin-top: 3px; }
+        .score-bold { font-weight: bold; color: #d32f2f; display: block; margin-top: 5px; font-size: 1.05em; }
+        
+        .cat-label { font-weight: bold; margin-top: 12px; display: block; color: #d32f2f; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; }
         .hidden { display: none !important; }
-        .logout-btn { background: #7f8c8d; font-size: 0.75em; padding: 10px; margin-top: 20px; width: auto; display: block; margin-left: auto; margin-right: auto; }
-        .dark-mode-toggle { width: auto; padding: 8px 12px; font-size: 0.75em; background: #555; margin: 0; float: right; }
+        .logout-btn { background: transparent; color: #888; font-size: 0.8em; text-decoration: underline; margin-top: 20px; padding: 5px; }
+        .dark-mode-toggle { width: auto; padding: 6px 12px; font-size: 0.75em; background: #555; position: absolute; right: 15px; top: 15px; border-radius: 20px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌓 Design umschalten</button>
-    <div style="clear:both;"></div>
+<div class="container" style="position: relative;">
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌓 Design</button>
 
     <div id="password-area">
-        <h2>Feuerwehr Zugang</h2>
-        <input type="password" id="pw-input" placeholder="Passwort..." style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc; font-size: 16px;">
-        <button onclick="checkPassword()">Einloggen</button>
+        <h2 style="margin-top: 25px;">Feuerwehr Login</h2>
+        <input type="password" id="pw-input" placeholder="Passwort..." style="width:100%; padding:15px; margin-bottom:15px; border-radius:10px; border:1px solid #ccc; font-size: 16px;">
+        <button onclick="checkPassword()">Anmelden</button>
     </div>
 
     <div id="login-area" class="hidden">
-        <h2 id="portal-title">Feuerwehr Login</h2>
-        <input type="text" id="user-name" placeholder="Dein Name..." style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc; font-size: 16px;">
+        <h2 id="portal-title" style="margin-top: 25px;">Quiz Portal</h2>
+        <input type="text" id="user-name" placeholder="Dein Vorname..." style="width:100%; padding:15px; margin-bottom:15px; border-radius:10px; border:1px solid #ccc; font-size: 16px;">
         
         <div id="menu">
-            <span class="cat-label">1. MANNSCHAFT (90 FRAGEN)</span>
+            <span class="cat-label">Mannschaft (90 Fragen)</span>
             <div class="part-row-tri">
                 <button class="menu-btn" onclick="preStart('mannschaft', 1)">Teil 1</button>
                 <button class="menu-btn" onclick="preStart('mannschaft', 2)">Teil 2</button>
@@ -76,14 +85,14 @@
             </div>
             <button class="exam-btn" onclick="preStart('mannschaft', 'exam')">⏱ Prüfungssimulation (30 Fr.)</button>
 
-            <span class="cat-label">2. MASCHINIST (60 FRAGEN)</span>
+            <span class="cat-label">Maschinist (60 Fragen)</span>
             <div class="part-row">
                 <button class="menu-btn" onclick="preStart('maschinist', 1)">Teil 1</button>
                 <button class="menu-btn" onclick="preStart('maschinist', 2)">Teil 2</button>
             </div>
             <button class="exam-btn" onclick="preStart('maschinist', 'exam')">⏱ Prüfungssimulation (30 Fr.)</button>
 
-            <span class="cat-label">3. GRUPPENFÜHRER (60 FRAGEN)</span>
+            <span class="cat-label">Gruppenführer (60 Fragen)</span>
             <div class="part-row">
                 <button class="menu-btn" onclick="preStart('gruppenfuehrer', 1)">Teil 1</button>
                 <button class="menu-btn" onclick="preStart('gruppenfuehrer', 2)">Teil 2</button>
@@ -92,7 +101,7 @@
 
             <hr style="border:0; border-top:1px solid #ddd; margin: 20px 0;">
             <button style="background: #2c3e50;" onclick="showGlobalLeaderboard()">🏆 Bestenliste ansehen</button>
-            <button class="logout-btn" onclick="logout()">Abmelden (Zurück zum Login)</button>
+            <button class="logout-btn" onclick="logout()">Abmelden & Zurück zum Passwort</button>
         </div>
     </div>
 
@@ -105,13 +114,13 @@
             <div id="feedback"></div>
             <button id="next-btn" onclick="nextQuestion()">Nächste Frage</button>
         </div>
-        <button id="abort-btn" style="background:#666; margin-top:30px;" onclick="confirmAbort()">Abbrechen / Menü</button>
+        <button id="abort-btn" style="background:#666; margin-top:30px; font-size: 0.9em;" onclick="confirmAbort()">Abbrechen</button>
     </div>
 
     <div id="leaderboard-view" style="display:none;">
-        <h2 id="leaderboard-title">🏆 Gesamt-Bestenliste</h2>
-        <div id="leaderboard-list">Lade Daten...</div>
-        <button style="background:#444;" onclick="backToMenu()">Zurück zum Menü</button>
+        <h2 id="leaderboard-title">🏆 Bestenliste</h2>
+        <div id="leaderboard-list">Lade Ranking...</div>
+        <button style="background:#444; margin-top: 20px;" onclick="backToMenu()">Zurück zum Hauptmenü</button>
     </div>
 </div>
 
@@ -374,7 +383,7 @@
     }
 
     function logout() {
-        if (confirm("Möchtest du dich wirklich abmelden und zum Passwort-Login zurückkehren?")) {
+        if (confirm("Möchtest du dich abmelden? Du musst danach das Passwort neu eingeben.")) {
             localStorage.removeItem('active_pw');
             location.reload();
         }
@@ -384,16 +393,14 @@
 
     function preStart(key, part) {
         const nameInput = document.getElementById("user-name").value.trim();
-        if (!nameInput) { alert("Bitte gib zuerst deinen Namen ein!"); return; }
+        if (!nameInput) { alert("Bitte gib deinen Namen ein!"); return; }
         currentPlayer = nameInput;
         currentCategory = key;
         currentPart = part;
 
         if (part === 'exam') {
-            // 30 Zufallsfragen aus dem ganzen Katalog
             currentQuestions = [...catalogs[key]].sort(() => 0.5 - Math.random()).slice(0, 30);
         } else {
-            // Teile lernen (1-30, 31-60, etc.)
             const startIdx = (part - 1) * 30;
             currentQuestions = catalogs[key].slice(startIdx, startIdx + 30);
         }
@@ -406,7 +413,7 @@
 
     function showQuestion() {
         const q = currentQuestions[currentIndex];
-        document.getElementById("progress").innerText = `Frage ${currentIndex+1}/${currentQuestions.length}`;
+        document.getElementById("progress").innerText = `FRAGE ${currentIndex+1} VON ${currentQuestions.length}`;
         document.getElementById("question-display").innerText = q.q;
         let html = "";
         for (let k in q.o) {
@@ -426,7 +433,7 @@
         const fb = document.getElementById("feedback");
         fb.style.display = "block";
         if (isCorrect) { score++; fb.innerText = "RICHTIG!"; fb.className = "correct"; }
-        else { fb.innerText = "FALSCH! Richtig: " + q.a.join(",").toUpperCase(); fb.className = "wrong"; }
+        else { fb.innerText = "FALSCH! Lösung: " + q.a.join(",").toUpperCase(); fb.className = "wrong"; }
         document.getElementById("check-btn").style.display = "none";
         document.getElementById("next-btn").style.display = "block";
     }
@@ -445,24 +452,20 @@
         const activePw = localStorage.getItem('active_pw');
 
         document.getElementById("progress").style.display = "none";
-        document.getElementById("abort-btn").style.display = "none";
         document.getElementById("quiz-box").innerHTML = `
-            <div class="result-card">
-                <h3>Ergebnis: ${currentPart === 'exam' ? 'Prüfung' : 'Teil ' + currentPart}</h3>
-                <p style="font-size: 1.2em; margin: 10px 0;">
-                    ✅ Richtig: <b>${score}</b><br>
-                    ❌ Falsch: <b>${wrong}</b>
+            <div class="result-card" style="text-align:center;">
+                <h3>${currentPart === 'exam' ? 'Prüfungssimulation' : 'Teil ' + currentPart} beendet</h3>
+                <p style="font-size: 1.1em;">
+                    ✅ Richtig: <b>${score}</b> | ❌ Falsch: <b>${wrong}</b>
                 </p>
-                <div style="font-size: 2.5em; font-weight: bold; color: ${percent >= 50 ? '#28a745' : '#d32f2f'}; margin: 15px 0;">
+                <div style="font-size: 3em; font-weight: bold; color: ${percent >= 50 ? '#28a745' : '#d32f2f'}; margin: 15px 0;">
                     ${percent}%
                 </div>
-                <p style="color: #888; font-size: 0.8em;">Ergebnis wurde gespeichert.</p>
                 <button onclick="showGlobalLeaderboard()">Zur Bestenliste</button>
-                <button style="background:#666; margin-top:10px;" onclick="location.reload()">Zum Hauptmenü</button>
+                <button style="background:#666; margin-top:10px;" onclick="location.reload()">Zum Menü</button>
             </div>
         `;
 
-        // Speichern unter Beibehaltung der alten Struktur
         const userRef = database.ref(`leaderboard/${deviceID}/${currentCategory}`);
         userRef.once('value', (snapshot) => {
             let data = snapshot.val() || { name: currentPlayer, room: activePw };
@@ -501,15 +504,14 @@
                     html += `<div class="entry"><b>${i+1}. ${e.name}</b><br>`;
                     [1, 2, 3].forEach(p => {
                         if(cat !== 'mannschaft' && p === 3) return;
-                        const d = (e.dates && e.dates['t'+p]) ? e.dates['t'+p] : '-';
-                        const c = (e.counts && e.counts['t'+p]) ? e.counts['t'+p] : 0;
                         const s = e['t'+p] || 0;
                         const last = (e.lasts && e.lasts['t'+p] !== undefined) ? e.lasts['t'+p] : '-';
-                        html += `<span class="score-info">Teil ${p}: Best: ${s}% | Letztes: ${last}% (${c} Versuche, am ${d})</span>`;
+                        const c = (e.counts && e.counts['t'+p]) ? e.counts['t'+p] : 0;
+                        html += `<span class="score-info">Teil ${p}: 🏆 ${s}% | Letztes: ${last}% (${c}x)</span>`;
                     });
                     const examBest = e.exam || 0;
                     const examLast = e.lasts && e.lasts.exam !== undefined ? e.lasts.exam : '-';
-                    html += `<span class="score-info" style="color:#e67e22">Prüfung: Best: ${examBest}% | Letzte: ${examLast}%</span>`;
+                    html += `<span class="score-info" style="color:#e67e22; font-weight:bold;">Prüfung: Best: ${examBest}% | Letzte: ${examLast}%</span>`;
                     html += `<span class="score-bold">Gesamt-Schnitt: ${e.total || 0}%</span></div>`;
                 });
                 html += `</div>`;
@@ -519,7 +521,7 @@
     }
 
     function backToMenu() { document.getElementById("leaderboard-view").style.display = "none"; document.getElementById("login-area").style.display = "block"; }
-    function confirmAbort() { if (confirm("Quiz wirklich abbrechen? Fortschritt wird nicht gespeichert.")) location.reload(); }
+    function confirmAbort() { if (confirm("Quiz abbrechen?")) location.reload(); }
 </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Feuerwehr Quiz Mobile</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -23,39 +23,68 @@
             --btn-secondary: #555;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: background 0.3s; }
-        body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.4; padding: 10px; background: var(--bg-color); color: var(--text-color); margin: 0; overflow-x: hidden; }
+        * { box-sizing: border-box; transition: background 0.3s; }
         
-        /* Mobile Container */
-        .container { max-width: 480px; margin: auto; background: var(--card-bg); padding: 15px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            line-height: 1.4; 
+            padding: 10px; 
+            background: var(--bg-color); 
+            color: var(--text-color); 
+            margin: 0; 
+        }
+        
+        /* Mobile Container: Passt sich dem Display an */
+        .container { 
+            width: 100%;
+            max-width: 500px; 
+            margin: auto; 
+            background: var(--card-bg); 
+            padding: 15px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+        }
         
         h2 { color: #d32f2f; margin-top: 0; text-align: center; font-size: 1.4em; }
         .progress { font-size: 0.85em; color: #777; margin-bottom: 10px; font-weight: bold; text-align: center; }
         
-        /* Fragen Ansicht */
         .question-text { font-weight: bold; margin-bottom: 15px; display: block; font-size: 1.1em; line-height: 1.3; }
-        .option { display: block; background: var(--bg-color); margin-bottom: 10px; padding: 15px 10px 15px 45px; border-radius: 10px; cursor: pointer; position: relative; border: 1px solid var(--border-color); min-height: 50px; font-size: 0.95em; }
+        
+        /* Optionen: Groß genug für Fingerbedienung */
+        .option { 
+            display: block; 
+            background: var(--bg-color); 
+            margin-bottom: 10px; 
+            padding: 15px 10px 15px 45px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            position: relative; 
+            border: 1px solid var(--border-color); 
+            min-height: 50px; 
+            font-size: 0.95em; 
+            word-wrap: break-word; /* Verhindert Text-Überlauf */
+        }
+        
         .option input { position: absolute; left: 12px; top: 14px; width: 22px; height: 22px; }
         
-        /* Buttons */
         button { background: #d32f2f; color: white; border: none; padding: 16px; border-radius: 10px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        
         .part-row-tri { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
         .part-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-        .menu-btn { background: var(--btn-secondary); font-size: 0.85em; padding: 12px 2px; }
+        
+        .menu-btn { background: var(--btn-secondary); font-size: 0.8em; padding: 12px 2px; }
         .exam-btn { background: #e67e22 !important; margin-top: 2px; margin-bottom: 12px; }
         
-        /* Feedback */
         #feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; font-weight: bold; text-align: center; }
         .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .wrong { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         
-        /* Rankings */
-        .leaderboard { margin-top: 15px; background: var(--bg-color); padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); }
+        .leaderboard { margin-top: 15px; background: var(--bg-color); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); overflow-x: auto; }
         .entry { padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85em; }
         .score-info { color: #888; display: block; font-size: 0.8em; margin-top: 3px; }
-        .score-bold { font-weight: bold; color: #d32f2f; display: block; margin-top: 5px; font-size: 1.05em; }
+        .score-bold { font-weight: bold; color: #d32f2f; display: block; margin-top: 5px; }
         
-        .cat-label { font-weight: bold; margin-top: 12px; display: block; color: #d32f2f; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; }
+        .cat-label { font-weight: bold; margin-top: 12px; display: block; color: #d32f2f; font-size: 0.85em; text-transform: uppercase; }
         .hidden { display: none !important; }
         .logout-btn { background: transparent; color: #888; font-size: 0.8em; text-decoration: underline; margin-top: 20px; padding: 5px; }
         .dark-mode-toggle { width: auto; padding: 6px 12px; font-size: 0.75em; background: #555; position: absolute; right: 15px; top: 15px; border-radius: 20px; }
@@ -67,7 +96,7 @@
     <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌓 Design</button>
 
     <div id="password-area">
-        <h2 style="margin-top: 25px;">Feuerwehr Login</h2>
+        <h2 style="margin-top: 25px;">Feuerwehr Zugang</h2>
         <input type="password" id="pw-input" placeholder="Passwort..." style="width:100%; padding:15px; margin-bottom:15px; border-radius:10px; border:1px solid #ccc; font-size: 16px;">
         <button onclick="checkPassword()">Anmelden</button>
     </div>
@@ -101,7 +130,7 @@
 
             <hr style="border:0; border-top:1px solid #ddd; margin: 20px 0;">
             <button style="background: #2c3e50;" onclick="showGlobalLeaderboard()">🏆 Bestenliste ansehen</button>
-            <button class="logout-btn" onclick="logout()">Abmelden & Zurück zum Passwort</button>
+            <button class="logout-btn" onclick="logout()">Abmelden & Passwort-Login</button>
         </div>
     </div>
 
@@ -114,7 +143,7 @@
             <div id="feedback"></div>
             <button id="next-btn" onclick="nextQuestion()">Nächste Frage</button>
         </div>
-        <button id="abort-btn" style="background:#666; margin-top:30px; font-size: 0.9em;" onclick="confirmAbort()">Abbrechen</button>
+        <button id="abort-btn" style="background:#666; margin-top:30px;" onclick="confirmAbort()">Abbrechen</button>
     </div>
 
     <div id="leaderboard-view" style="display:none;">
@@ -137,9 +166,7 @@
     const PW_HEDDESHEIM = "68542";
     const PW_SCHRIESHEIM = "06220";
 
-    // ############################################################
-    // ### HIER DEINE FRAGEN EINTRAGEN                          ###
-    // ############################################################
+    // --- FRAGEN KATALOG (HIER EINTRAGEN) ---
     const catalogs = {
         mannschaft: [{ id: 1, q: " Wer ist nach dem Feuerwehrgesetz Baden-Württemberg für die Aufstellung, Ausrüstung und Unterhaltung der Feuerwehr verantwortlich?", o: {a: "Bund", b: "Land", c: "Kreis", d: "Gemeinde", e: "Kommandant"}, a: ["d"] },
         { id: 2, q: " Welches sind Rechtsgrundlagen der Feuerwehr?", o: {a: "Bürgerliches Gesetzbuch", b: "Feuerwehrgesetz Baden-Württemberg", c: "Feuerwehrsatzung der Gemeinde", d: "Landesverfassung Baden-Württemberg"}, a: ["b", "c"] },
@@ -355,7 +382,6 @@
         { id: 60, q: " Bereiche mit ABC-Gefahrstoffen werden bei der Einsatzvorbereitung entsprechend den auszu-\nführenden Maßnahmen in drei Gefahrengruppen eingeteilt. Welche Zuordnung ist richtig?", o: {a: "Gefahrengruppe I - Bereiche, in denen die Einsatzkräfte nur mit Sonderausrüstung und unter besonderer Über-\nwachung und Dekontamination/Hygiene tätig werden dürfen", b: "Gefahrengruppe II - Bereiche, in denen die Einsatzkräfte ohne Sonderausrüstung tätig werden dürfen. Zur\nVermeidung einer Inkorporation soll jedoch Atemschutz getragen werden", c: "Gefahrengruppe III - Bereiche, in denen Einsatzkräfte nur mit Sonderausrüstung und unter besonderer Über-\nnwachung und Dekontamination/Hygiene tätig werden dürfen und deren Eigenart die Anwesenheit einer fach-\nkundigen Person notwendig macht, die während des Einsatzes die entstehende Gefährdung und die anzuwen-\ndenden Schutzmaßnahmen beurteilen kann"}, a: ["c"] }
         ]
     };
-    // ############################################################
 
     let deviceID = localStorage.getItem("quiz_device_id") || 'dev_' + Math.random().toString(36).substr(2, 9);
     localStorage.setItem("quiz_device_id", deviceID);
@@ -383,7 +409,7 @@
     }
 
     function logout() {
-        if (confirm("Möchtest du dich abmelden? Du musst danach das Passwort neu eingeben.")) {
+        if (confirm("Wirklich abmelden und zurück zum Passwort-Login?")) {
             localStorage.removeItem('active_pw');
             location.reload();
         }
@@ -446,23 +472,20 @@
 
     function finishQuiz() {
         const total = currentQuestions.length;
-        const wrong = total - score;
         const percent = Math.round((score / total) * 100);
-        const datum = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+        const datum = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
         const activePw = localStorage.getItem('active_pw');
 
         document.getElementById("progress").style.display = "none";
         document.getElementById("quiz-box").innerHTML = `
-            <div class="result-card" style="text-align:center;">
-                <h3>${currentPart === 'exam' ? 'Prüfungssimulation' : 'Teil ' + currentPart} beendet</h3>
-                <p style="font-size: 1.1em;">
-                    ✅ Richtig: <b>${score}</b> | ❌ Falsch: <b>${wrong}</b>
-                </p>
+            <div style="text-align:center; padding: 20px; background: var(--card-bg); border-radius: 15px;">
+                <h3>${currentPart === 'exam' ? 'Prüfung' : 'Teil ' + currentPart} beendet</h3>
+                <p>Richtig: ${score} | Falsch: ${total - score}</p>
                 <div style="font-size: 3em; font-weight: bold; color: ${percent >= 50 ? '#28a745' : '#d32f2f'}; margin: 15px 0;">
                     ${percent}%
                 </div>
-                <button onclick="showGlobalLeaderboard()">Zur Bestenliste</button>
-                <button style="background:#666; margin-top:10px;" onclick="location.reload()">Zum Menü</button>
+                <button onclick="showGlobalLeaderboard()">Bestenliste</button>
+                <button style="background:#666; margin-top:10px;" onclick="location.reload()">Menü</button>
             </div>
         `;
 
@@ -506,12 +529,10 @@
                         if(cat !== 'mannschaft' && p === 3) return;
                         const s = e['t'+p] || 0;
                         const last = (e.lasts && e.lasts['t'+p] !== undefined) ? e.lasts['t'+p] : '-';
-                        const c = (e.counts && e.counts['t'+p]) ? e.counts['t'+p] : 0;
-                        html += `<span class="score-info">Teil ${p}: 🏆 ${s}% | Letztes: ${last}% (${c}x)</span>`;
+                        html += `<span class="score-info">Teil ${p}: Best: ${s}% | Letztes: ${last}%</span>`;
                     });
                     const examBest = e.exam || 0;
-                    const examLast = e.lasts && e.lasts.exam !== undefined ? e.lasts.exam : '-';
-                    html += `<span class="score-info" style="color:#e67e22; font-weight:bold;">Prüfung: Best: ${examBest}% | Letzte: ${examLast}%</span>`;
+                    html += `<span class="score-info" style="color:#e67e22; font-weight:bold;">Prüfung: Bestwert ${examBest}%</span>`;
                     html += `<span class="score-bold">Gesamt-Schnitt: ${e.total || 0}%</span></div>`;
                 });
                 html += `</div>`;

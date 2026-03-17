@@ -34,7 +34,6 @@
             margin: 0; 
         }
         
-        /* Mobile Container: Passt sich dem Display an */
         .container { 
             width: 100%;
             max-width: 500px; 
@@ -50,7 +49,6 @@
         
         .question-text { font-weight: bold; margin-bottom: 15px; display: block; font-size: 1.1em; line-height: 1.3; }
         
-        /* Optionen: Groß genug für Fingerbedienung */
         .option { 
             display: block; 
             background: var(--bg-color); 
@@ -62,7 +60,7 @@
             border: 1px solid var(--border-color); 
             min-height: 50px; 
             font-size: 0.95em; 
-            word-wrap: break-word; /* Verhindert Text-Überlauf */
+            word-wrap: break-word;
         }
         
         .option input { position: absolute; left: 12px; top: 14px; width: 22px; height: 22px; }
@@ -72,17 +70,17 @@
         .part-row-tri { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
         .part-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
         
-        .menu-btn { background: var(--btn-secondary); font-size: 0.8em; padding: 12px 2px; }
+        .menu-btn { background: var(--btn-secondary); font-size: 0.85em; padding: 12px 2px; }
         .exam-btn { background: #e67e22 !important; margin-top: 2px; margin-bottom: 12px; }
         
         #feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; font-weight: bold; text-align: center; }
         .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .wrong { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         
-        .leaderboard { margin-top: 15px; background: var(--bg-color); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); overflow-x: auto; }
+        .leaderboard { margin-top: 15px; background: var(--bg-color); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); }
         .entry { padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85em; }
-        .score-info { color: #888; display: block; font-size: 0.8em; margin-top: 3px; }
-        .score-bold { font-weight: bold; color: #d32f2f; display: block; margin-top: 5px; }
+        .score-info { color: #888; display: block; font-size: 0.78em; margin-top: 3px; line-height: 1.3; }
+        .score-bold { font-weight: bold; color: #d32f2f; display: block; margin-top: 5px; font-size: 1em; }
         
         .cat-label { font-weight: bold; margin-top: 12px; display: block; color: #d32f2f; font-size: 0.85em; text-transform: uppercase; }
         .hidden { display: none !important; }
@@ -102,7 +100,7 @@
     </div>
 
     <div id="login-area" class="hidden">
-        <h2 id="portal-title" style="margin-top: 25px;">Quiz Portal</h2>
+        <h2 id="portal-title" style="margin-top: 25px;">Hauptmenü</h2>
         <input type="text" id="user-name" placeholder="Dein Vorname..." style="width:100%; padding:15px; margin-bottom:15px; border-radius:10px; border:1px solid #ccc; font-size: 16px;">
         
         <div id="menu">
@@ -143,7 +141,7 @@
             <div id="feedback"></div>
             <button id="next-btn" onclick="nextQuestion()">Nächste Frage</button>
         </div>
-        <button id="abort-btn" style="background:#666; margin-top:30px;" onclick="confirmAbort()">Abbrechen</button>
+        <button id="abort-btn" style="background:#666; margin-top:30px;" onclick="confirmAbort()">Abbrechen / Hauptmenü</button>
     </div>
 
     <div id="leaderboard-view" style="display:none;">
@@ -154,7 +152,6 @@
 </div>
 
 <script>
-    // --- FIREBASE KONFIGURATION ---
     const firebaseConfig = {
         apiKey: "AIzaSyCs_FBU4LD6SWrNqgTEJgYV_RpP5R_W0IE",
         databaseURL: "https://las-gold-default-rtdb.europe-west1.firebasedatabase.app/",
@@ -405,11 +402,11 @@
     function applyAccess(pw) {
         document.getElementById('password-area').classList.add('hidden');
         document.getElementById('login-area').classList.remove('hidden');
-        document.getElementById('portal-title').innerText = "Feuerwehr " + (pw === PW_HEDDESHEIM ? "Heddesheim" : "Schriesheim");
+        document.getElementById('portal-title').innerText = "Feuerwehr " + (pw === PW_HEDDESHEIM ? "Heddesheim" : "Schriesheim") + " - Hauptmenü";
     }
 
     function logout() {
-        if (confirm("Wirklich abmelden und zurück zum Passwort-Login?")) {
+        if (confirm("Abmelden? Du musst danach das Passwort neu eingeben.")) {
             localStorage.removeItem('active_pw');
             location.reload();
         }
@@ -478,14 +475,12 @@
 
         document.getElementById("progress").style.display = "none";
         document.getElementById("quiz-box").innerHTML = `
-            <div style="text-align:center; padding: 20px; background: var(--card-bg); border-radius: 15px;">
-                <h3>${currentPart === 'exam' ? 'Prüfung' : 'Teil ' + currentPart} beendet</h3>
+            <div style="text-align:center;">
+                <h3>Ergebnis: ${currentPart === 'exam' ? 'Prüfung' : 'Teil ' + currentPart}</h3>
                 <p>Richtig: ${score} | Falsch: ${total - score}</p>
-                <div style="font-size: 3em; font-weight: bold; color: ${percent >= 50 ? '#28a745' : '#d32f2f'}; margin: 15px 0;">
-                    ${percent}%
-                </div>
+                <div style="font-size: 3em; font-weight: bold; color: ${percent >= 50 ? '#28a745' : '#d32f2f'}; margin: 15px 0;">${percent}%</div>
                 <button onclick="showGlobalLeaderboard()">Bestenliste</button>
-                <button style="background:#666; margin-top:10px;" onclick="location.reload()">Menü</button>
+                <button style="background:#666; margin-top:10px;" onclick="location.reload()">Hauptmenü</button>
             </div>
         `;
 
@@ -529,10 +524,14 @@
                         if(cat !== 'mannschaft' && p === 3) return;
                         const s = e['t'+p] || 0;
                         const last = (e.lasts && e.lasts['t'+p] !== undefined) ? e.lasts['t'+p] : '-';
-                        html += `<span class="score-info">Teil ${p}: Best: ${s}% | Letztes: ${last}%</span>`;
+                        const c = (e.counts && e.counts['t'+p]) ? e.counts['t'+p] : 0;
+                        const d = (e.dates && e.dates['t'+p]) ? e.dates['t'+p] : '-';
+                        html += `<span class="score-info">Teil ${p}: 🏆 ${s}% | Letztes: ${last}% | Versuche: ${c} (am ${d})</span>`;
                     });
                     const examBest = e.exam || 0;
-                    html += `<span class="score-info" style="color:#e67e22; font-weight:bold;">Prüfung: Bestwert ${examBest}%</span>`;
+                    const examLast = e.lasts && e.lasts.exam !== undefined ? e.lasts.exam : '-';
+                    const examCount = (e.counts && e.counts.exam) ? e.counts.exam : 0;
+                    html += `<span class="score-info" style="color:#e67e22; font-weight:bold;">Prüfung: Best: ${examBest}% | Letzte: ${examLast}% (${examCount}x)</span>`;
                     html += `<span class="score-bold">Gesamt-Schnitt: ${e.total || 0}%</span></div>`;
                 });
                 html += `</div>`;

@@ -21,14 +21,16 @@
         .wrong { background: #f8d7da; color: #721c24; }
         #next-btn { background: #28a745; display: none; }
         .leaderboard { margin-top: 20px; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
-        .entry { display: flex; flex-direction: column; padding: 10px 0; border-bottom: 1px solid #ddd; font-size: 0.9em; }
+        .entry { padding: 10px 0; border-bottom: 1px solid #ddd; font-size: 0.85em; }
         .menu-btn { background: #444; margin-bottom: 5px; font-size: 0.9em; }
         .stats-btn { background: #2c3e50; margin-top: 20px; }
-        .part-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 15px; }
+        .part-row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 15px; }
+        .part-row-tri { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 15px; }
         .cat-label { font-weight: bold; margin-top: 10px; display: block; color: #333; }
         hr { border: 0; border-top: 1px solid #ddd; margin: 20px 0; }
-        .score-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 0.8em; margin-top: 5px; color: #555; }
+        .score-info { color: #555; margin-top: 4px; display: block; font-size: 0.85em; }
         .score-bold { font-weight: bold; color: #d32f2f; }
+        .result-card { text-align: center; padding: 20px; border: 2px solid #d32f2f; border-radius: 10px; background: #fff; }
     </style>
 </head>
 <body>
@@ -41,7 +43,7 @@
 
     <div id="menu">
         <span class="cat-label">1. MANNSCHAFT (90 FRAGEN)</span>
-        <div class="part-row">
+        <div class="part-row-tri">
             <button class="menu-btn" onclick="preStart('mannschaft', 1)">Teil 1</button>
             <button class="menu-btn" onclick="preStart('mannschaft', 2)">Teil 2</button>
             <button class="menu-btn" onclick="preStart('mannschaft', 3)">Teil 3</button>
@@ -51,14 +53,12 @@
         <div class="part-row">
             <button class="menu-btn" onclick="preStart('maschinist', 1)">Teil 1</button>
             <button class="menu-btn" onclick="preStart('maschinist', 2)">Teil 2</button>
-            <button class="menu-btn" onclick="preStart('maschinist', 3)">Teil 3</button>
         </div>
 
         <span class="cat-label">3. GRUPPENFÜHRER (60 FRAGEN)</span>
         <div class="part-row">
-            <button class="menu-btn" onclick="preStart('gruppenfuehrer', 1)">Teil 1</button>
-            <button class="menu-btn" onclick="preStart('gruppenfuehrer', 2)">Teil 2</button>
-            <button class="menu-btn" onclick="preStart('gruppenfuehrer', 3)">Teil 3</button>
+            <button class="menu-btn" onclick="preStart('gruppenfuehrer', 1)">Teil 1 (1-30)</button>
+            <button class="menu-btn" onclick="preStart('gruppenfuehrer', 2)">Teil 2 (31-60)</button>
         </div>
         
         <hr>
@@ -74,7 +74,7 @@
             <div id="feedback"></div>
             <button id="next-btn" onclick="nextQuestion()">Nächste Frage</button>
         </div>
-        <button style="background:#666; margin-top:30px;" onclick="location.reload()">Abbrechen / Menü</button>
+        <button id="abort-btn" style="background:#666; margin-top:30px;" onclick="location.reload()">Abbrechen / Menü</button>
     </div>
 
     <div id="leaderboard-view" style="display:none;">
@@ -101,7 +101,6 @@
     let deviceID = localStorage.getItem("quiz_device_id") || 'dev_' + Math.random().toString(36).substr(2, 9);
     localStorage.setItem("quiz_device_id", deviceID);
 
-    // HIER DEINE FRAGEN EINTRAGEN
     const catalogs = {
         mannschaft: [{ id: 1, q: " Wer ist nach dem Feuerwehrgesetz Baden-Württemberg für die Aufstellung, Ausrüstung und Unterhaltung der Feuerwehr verantwortlich?", o: {a: "Bund", b: "Land", c: "Kreis", d: "Gemeinde", e: "Kommandant"}, a: ["d"] },
         { id: 2, q: " Welches sind Rechtsgrundlagen der Feuerwehr?", o: {a: "Bürgerliches Gesetzbuch", b: "Feuerwehrgesetz Baden-Württemberg", c: "Feuerwehrsatzung der Gemeinde", d: "Landesverfassung Baden-Württemberg"}, a: ["b", "c"] },
@@ -193,7 +192,7 @@
         { id: 88, q: " Welche Aussage ist richtig?", o: {a: "Bei jedem Atemschutzeinsatz mit Isoliergeräten und bei jeder Übung mit Isoliergeräten muss grundsätzlich eine Atemschutzüberwachung durchgeführt werden.", b: "Bei Übungen mit Isoliergeräten kann auf eine Atemschutzüberwachung verzichtet werden."}, a: ["a"] },
         { id: 89, q: " Wer ist Verantwortlich für die Atemschutzüberwachung?", o: {a: "Verantwortliche Führungskraft im Einsatz", b: "Gruppenführer", c: "Staffelführer", d: "Truppführer"}, a: ["a", "b", "c", "d"] },
         { id: 90, q: " Im Bereich der Absturzsicherung spricht man von „Halten“ und „Auffangen“. Wo liegt der Unterschied?", o: {a: "Es gibt kein Unterschied", b: "Der Unterschied liegt in den verwendeten Seilen (Halten - Feuerwehrhalteleine; Auffangen - Kernmanteldy- namikseil)", c: "Halten ist sichern an einer straff geführten Leine. Die Leine kommt immer von oberhalb der zu sichernden Person. Ein freier Fall ist auszuschließen", d: "Auffangen ist sichern in Bereichen, in denen ein freier Fall nicht ausgeschlossen werden kann"}, a: ["b", "c", "d"] }
-          ],
+        ],
         maschinist: [{ id: 1, q: " Auf was muss für die Betriebssicherheit an einem Feuerwehrfahrzeug geachtet werden?", o: {a: "Wasser", b: "Motorenöl", c: "Beladung vollständig", d: "Reifenluftdruck", e: "Kraftstoff", f: "Funkausrüstung", g: "Elektrische Anlage"}, a: ["a", "b", "d", "e", "g"] },
         { id: 2, q: " Wie groß soll der Elektrodenabstand bei der Zündkerze im Motor der Tragkraftspritze mit VW- Industriemotor sein und in welcher Stellung hat der Kraftstoffhahn nach beendetem Einsatz zu stehen?", o: {a: "0,6 bis 0,7 mm", b: "0,4 mm", c: "Unter 0,2 mm", d: "Auf", e: "Zu"}, a: ["b", "d"] },
         { id: 3, q: " Auf was muss bei der Überprüfung der Verkehrssicherheit geachtet werden?", o: {a: "Bremsen", b: "Beleuchtung", c: "Bereifung", d: "Beladung", e: "Nebenantrieb", f: "Lenkung", g: "Signal", h: "Spiegel", i: "Scheibenwischer", j: "Kraftstoff"}, a: ["a", "b", "c", "d", "f", "g", "h", "i"] },
@@ -254,7 +253,7 @@
         { id: 58, q: " Wie kann sich der Maschinist helfen, wenn die Entlüftungseinrichtung der Feuerlöschkreisel- pumpe ausgefallen ist?", o: {a: "Bei Tanklöschfahrzeugen Feuerlöschkreiselpumpe und Saugleitung aus dem eingebauten Löschwasserbehälter füllen", b: "Gruppenführer benachrichtigen, damit eine Feuerlöschkreiselpumpe nachgefordert wird", c: "Pumpe und Saugleitung „von Hand“ auffüllen"}, a: ["a", "b", "c"] },
         { id: 59, q: " Worauf hat der Maschinist im Winter bei einer Flüssigkeitsring-Entlüftungseinrichtung zu ach- ten?", o: {a: "Dass die Feuerlöschkreiselpumpe nur im beheizten Feuerwehrhaus abgestellt wird", b: "Dass die Feuerlöschkreiselpumpe samt Entlüftungseinrichtung nach jedem Einsatz und jeder Übung entleert wird", c: "Dass die Entlüftungseinrichtung mit Frostschutzmittel aufgefüllt wird"}, a: ["b", "c"] },
         { id: 60, q: " Wer ist bei einer Einsatzfahrt für das Feuerwehrfahrzeug verantwortlich?", o: {a: "Der Maschinist als Fahrer des Feuerwehrfahrzeuges", b: "Der Gruppenführer", c: "Der Zugführer"}, a: ["a"] }
-      ],
+     ],
         gruppenfuehrer: [{ id: 1, q: " Welche Aussagen sind richtig?", o: {a: "Die Feuerwehr ist eine gemeinnützige, der Nächstenhilfe dienende Einrichtung", b: "Die Feuerwehr ist ein gemeinnütziger Verein", c: "Die Feuerwehr ist ein Verein, ohne eigene Rechtspersönlichkeit", d: "Die Feuerwehr ist eine Einrichtung der Gemeinde"}, a: ["a", "d"] },
         { id: 2, q: " Welche Grundrechte können zur Erfüllung der Aufgaben der Feuerwehr nach § 2 des Feuer-\nwehrgesetzes (FwG) Baden-Württemberg eingeschränkt werden?", o: {a: "Freiheit der Person", b: "Meinungsfreiheit / Pressefreiheit", c: "Gleichheit vor dem Gesetz", d: "Versammlungsfreiheit", e: "Unverletzlichkeit der Wohnung", f: "Recht auf Eigentum"}, a: ["a", "e", "f"] },
         { id: 3, q: " Welche Aufgabe hat der Feuerwehrausschuss (Abteilungsausschuss) entsprechend dem Feu-\nerwehrgesetz (FwG) Baden-Württemberg und in welchen Zeitabständen ist er zu wählen?", o: {a: "Jahresabschlussübung vorbereiten", b: "Beratung des Kommandanten", c: "Beschaffung von Feuerwehrfahrzeugen", d: "Feuerwehrangehörige bei fortgesetzter Nachlässigkeit im Dienst entlassen", e: "Kommandant unterstützen", f: "Feuerwehrsatzung erstellen", g: "Drei Jahre", h: "Fünf Jahre"}, a: ["b", "e", "h"] },
@@ -314,7 +313,8 @@
         { id: 57, q: " Welche Aussage für Erdgas ist richtig?", o: {a: "Erdgas ist leichter als Luft", b: "Erdgas ist gut riechbar", c: "Erdgas ist eingeatmet ein Blutgift"}, a: ["a"] },
         { id: 58, q: " Welche grundsätzlichen Schutzmaßnahmen sind beim Einsatz mit radioaktiven Stoffen zu be-\nachten?", o: {a: "Abstand halten (groß)", b: "Aufenthaltsdauer kurz", c: "Abschirmung ausnutzen", d: "Kontamination vermeiden", e: "Inkorporation vermeiden", f: "Radioaktiven Stoff mit viel Wasser kühlen", g: "Radioaktiven Stoff aufnehmen"}, a: ["a", "b", "c", "d", "e"] },
         { id: 59, q: " Welcher Abstand ist bis zur Festlegung der Absperrgrenze für nicht unmittelbar am Einsatz be-\nteiligte Einsatzkräfte bei Unfällen mit radioaktiven Stoffen vom Schadensobjekt einzuhalten?", o: {a: "10 Meter", b: "25 Meter", c: "50 Meter"}, a: ["c"] },
-        { id: 60, q: " Bereiche mit ABC-Gefahrstoffen werden bei der Einsatzvorbereitung entsprechend den auszu-\nführenden Maßnahmen in drei Gefahrengruppen eingeteilt. Welche Zuordnung ist richtig?", o: {a: "Gefahrengruppe I - Bereiche, in denen die Einsatzkräfte nur mit Sonderausrüstung und unter besonderer Über-\nwachung und Dekontamination/Hygiene tätig werden dürfen", b: "Gefahrengruppe II - Bereiche, in denen die Einsatzkräfte ohne Sonderausrüstung tätig werden dürfen. Zur\nVermeidung einer Inkorporation soll jedoch Atemschutz getragen werden", c: "Gefahrengruppe III - Bereiche, in denen Einsatzkräfte nur mit Sonderausrüstung und unter besonderer Über-\nnwachung und Dekontamination/Hygiene tätig werden dürfen und deren Eigenart die Anwesenheit einer fach-\nkundigen Person notwendig macht, die während des Einsatzes die entstehende Gefährdung und die anzuwen-\ndenden Schutzmaßnahmen beurteilen kann"}, a: ["c"] }]
+        { id: 60, q: " Bereiche mit ABC-Gefahrstoffen werden bei der Einsatzvorbereitung entsprechend den auszu-\nführenden Maßnahmen in drei Gefahrengruppen eingeteilt. Welche Zuordnung ist richtig?", o: {a: "Gefahrengruppe I - Bereiche, in denen die Einsatzkräfte nur mit Sonderausrüstung und unter besonderer Über-\nwachung und Dekontamination/Hygiene tätig werden dürfen", b: "Gefahrengruppe II - Bereiche, in denen die Einsatzkräfte ohne Sonderausrüstung tätig werden dürfen. Zur\nVermeidung einer Inkorporation soll jedoch Atemschutz getragen werden", c: "Gefahrengruppe III - Bereiche, in denen Einsatzkräfte nur mit Sonderausrüstung und unter besonderer Über-\nnwachung und Dekontamination/Hygiene tätig werden dürfen und deren Eigenart die Anwesenheit einer fach-\nkundigen Person notwendig macht, die während des Einsatzes die entstehende Gefährdung und die anzuwen-\ndenden Schutzmaßnahmen beurteilen kann"}, a: ["c"] }
+        ]
     };
 
     let currentQuestions = [], currentIndex = 0, score = 0, currentPlayer = "", currentCategory = "", currentPart = 0;
@@ -327,18 +327,20 @@
         currentCategory = key;
         currentPart = part;
 
-        const totalQuestions = catalogs[key].length;
-        const perPart = Math.ceil(totalQuestions / 3);
-        const startIdx = (part - 1) * perPart;
-        const endIdx = startIdx + perPart;
+        let startIdx, endIdx;
+        if (key === 'gruppenfuehrer') {
+            startIdx = (part === 1) ? 0 : 30;
+            endIdx = (part === 1) ? 30 : 60;
+        } else {
+            const totalQuestions = catalogs[key].length;
+            const partsCount = (key === 'mannschaft' ? 3 : 2);
+            const perPart = Math.ceil(totalQuestions / partsCount);
+            startIdx = (part - 1) * perPart;
+            endIdx = startIdx + perPart;
+        }
 
-        // Teil-Bereich ausschneiden und mischen
         currentQuestions = catalogs[key].slice(startIdx, endIdx).sort(() => Math.random() - 0.5);
-        
-        if (currentQuestions.length === 0) { alert("In diesem Teil sind keine Fragen vorhanden."); return; }
-
-        currentIndex = 0;
-        score = 0;
+        currentIndex = 0; score = 0;
         document.getElementById("login-area").style.display = "none";
         document.getElementById("menu").style.display = "none";
         document.getElementById("quiz-area").style.display = "block";
@@ -347,11 +349,11 @@
 
     function showQuestion() {
         const q = currentQuestions[currentIndex];
-        document.getElementById("progress").innerText = `Kategorie: ${currentCategory.toUpperCase()} (Teil ${currentPart}) | Frage ${currentIndex+1}/${currentQuestions.length}`;
+        document.getElementById("progress").innerText = `Frage ${currentIndex+1}/${currentQuestions.length}`;
         document.getElementById("question-display").innerText = q.q;
         let html = "";
         for (let k in q.o) {
-            html += `<label class="option" id="l-${k}"><input type="checkbox" name="ans" value="${k}" onchange="this.parentElement.classList.toggle('selected')">${k.toUpperCase()}: ${q.o[k]}</label>`;
+            html += `<label class="option"><input type="checkbox" name="ans" value="${k}">${k.toUpperCase()}: ${q.o[k]}</label>`;
         }
         document.getElementById("options-display").innerHTML = html;
         document.getElementById("feedback").style.display = "none";
@@ -378,20 +380,45 @@
     }
 
     function finishQuiz() {
-        const percent = Math.round((score / currentQuestions.length) * 100);
-        const userRef = database.ref('leaderboard/' + deviceID + '/' + currentCategory);
+        const total = currentQuestions.length;
+        const wrong = total - score;
+        const percent = Math.round((score / total) * 100);
+        const datum = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+        
+        // Anzeige der Ergebnisse
+        document.getElementById("progress").style.display = "none";
+        document.getElementById("abort-btn").style.display = "none";
+        const quizBox = document.getElementById("quiz-box");
+        quizBox.innerHTML = `
+            <div class="result-card">
+                <h3 style="color: #d32f2f;">Ergebnis: Teil ${currentPart}</h3>
+                <p style="font-size: 1.2em; margin: 10px 0;">
+                    ✅ Richtig: <b>${score}</b><br>
+                    ❌ Falsch: <b>${wrong}</b>
+                </p>
+                <div style="font-size: 2.5em; font-weight: bold; color: ${percent >= 50 ? '#28a745' : '#d32f2f'}; margin: 15px 0;">
+                    ${percent}%
+                </div>
+                <p style="color: #666; font-size: 0.9em;">Dein Ergebnis wurde gespeichert.</p>
+                <button onclick="showGlobalLeaderboard()">Zur Bestenliste</button>
+                <button style="background:#666; margin-top:10px;" onclick="location.reload()">Zum Hauptmenü</button>
+            </div>
+        `;
 
+        const userRef = database.ref('leaderboard/' + deviceID + '/' + currentCategory);
         userRef.once('value', (snapshot) => {
-            let data = snapshot.val() || { name: currentPlayer, t1: 0, t2: 0, t3: 0 };
+            let data = snapshot.val() || { name: currentPlayer };
+            if(!data.counts) data.counts = {t1:0, t2:0, t3:0};
+            if(!data.dates) data.dates = {t1:'', t2:'', t3:''};
+            
             data.name = currentPlayer;
             data['t' + currentPart] = Math.max(data['t' + currentPart] || 0, percent);
-            
-            // Gesamt-Durchschnitt berechnen
-            data.total = Math.round(((data.t1 || 0) + (data.t2 || 0) + (data.t3 || 0)) / 3);
+            data.counts['t' + currentPart] = (data.counts['t' + currentPart] || 0) + 1;
+            data.dates['t' + currentPart] = datum;
 
-            userRef.set(data).then(() => {
-                showGlobalLeaderboard();
-            });
+            const div = (currentCategory === 'mannschaft') ? 3 : 2;
+            data.total = Math.round(((data.t1 || 0) + (data.t2 || 0) + (data.t3 || 0)) / div);
+            userRef.set(data);
         });
     }
 
@@ -404,32 +431,23 @@
         database.ref('leaderboard').once('value', (snapshot) => {
             const allData = snapshot.val();
             let html = "";
-            const categories = ['mannschaft', 'maschinist', 'gruppenfuehrer'];
-            
-            categories.forEach(cat => {
+            ['mannschaft', 'maschinist', 'gruppenfuehrer'].forEach(cat => {
                 html += `<div class="leaderboard"><h3>🚒 ${cat.toUpperCase()}</h3>`;
                 let entries = [];
-                for (let devId in allData) {
-                    if (allData[devId][cat]) entries.push(allData[devId][cat]);
-                }
+                for (let id in allData) { if (allData[id][cat]) entries.push(allData[id][cat]); }
                 entries.sort((a, b) => b.total - a.total);
                 
-                if (entries.length === 0) {
-                    html += `<div class="entry">Noch keine Ergebnisse</div>`;
-                } else {
-                    entries.forEach((e, index) => {
-                        html += `
-                            <div class="entry">
-                                <b>${index+1}. ${e.name}</b>
-                                <div class="score-grid">
-                                    <span>T1: ${e.t1||0}%</span>
-                                    <span>T2: ${e.t2||0}%</span>
-                                    <span>T3: ${e.t3||0}%</span>
-                                    <span class="score-bold">Ges: ${e.total||0}%</span>
-                                </div>
-                            </div>`;
+                entries.forEach((e, i) => {
+                    html += `<div class="entry"><b>${i+1}. ${e.name}</b><br>`;
+                    [1, 2, 3].forEach(p => {
+                        if(cat !== 'mannschaft' && p === 3) return;
+                        const d = (e.dates && e.dates['t'+p]) ? e.dates['t'+p] : '-';
+                        const c = (e.counts && e.counts['t'+p]) ? e.counts['t'+p] : 0;
+                        const s = e['t'+p] || 0;
+                        html += `<span class="score-info">Teil ${p}: ${s}% (${c} Versuche, am ${d})</span>`;
                     });
-                }
+                    html += `<span class="score-bold">Gesamt-Schnitt: ${e.total || 0}%</span></div>`;
+                });
                 html += `</div>`;
             });
             document.getElementById("leaderboard-list").innerHTML = html;
@@ -437,4 +455,4 @@
     }
 </script>
 </body>
-</html> 
+</html>

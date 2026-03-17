@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Feuerwehr Quiz Pro</title>
+    <title>Feuerwehr Quiz - Mobile Pro</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -13,71 +13,59 @@
             --text-color: #333;
             --border-color: #ddd;
             --btn-secondary: #444;
-            --input-bg: #fff;
         }
 
-        /* Dark Mode Definition */
         body.dark-mode {
             --bg-color: #1a1a1a;
             --card-bg: #2d2d2d;
             --text-color: #f0f0f0;
             --border-color: #444;
             --btn-secondary: #555;
-            --input-bg: #3d3d3d;
         }
 
-        * { box-sizing: border-box; transition: background 0.3s, color 0.2s; }
+        * { box-sizing: border-box; transition: background 0.3s, color 0.3s; }
         body { font-family: sans-serif; line-height: 1.4; padding: 10px; background: var(--bg-color); color: var(--text-color); margin: 0; }
-        .container { max-width: 500px; margin: auto; background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        
+        .container { max-width: 500px; margin: auto; background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         h2 { color: #d32f2f; margin-top: 0; text-align: center; font-size: 1.5em; }
-        input { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); }
-        
-        .progress { font-size: 0.9em; color: #888; margin-bottom: 10px; font-weight: bold; }
+        .progress { font-size: 0.9em; color: #666; margin-bottom: 10px; font-weight: bold; }
         .question-text { font-weight: bold; margin-bottom: 15px; display: block; font-size: 1.1em; white-space: pre-wrap; }
-        
         .option { display: block; background: var(--bg-color); margin-bottom: 8px; padding: 12px 10px 12px 45px; border-radius: 8px; cursor: pointer; position: relative; border: 1px solid var(--border-color); min-height: 45px; }
         .option input { position: absolute; left: 12px; top: 12px; width: 22px; height: 22px; }
-        
         button { background: #d32f2f; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 10px; }
-        .part-row-tri { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
         .part-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        
-        .menu-btn { background: var(--btn-secondary); font-size: 0.85em; padding: 10px 5px; }
+        .part-row-tri { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+        .menu-btn { background: var(--btn-secondary); margin-bottom: 0; font-size: 0.85em; padding: 12px 5px; }
         .exam-btn { background: #e67e22 !important; margin-top: 5px; }
-        
         #feedback { margin-top: 15px; padding: 12px; border-radius: 6px; display: none; font-weight: bold; text-align: center; }
         .correct { background: #d4edda; color: #155724; }
         .wrong { background: #f8d7da; color: #721c24; }
         #next-btn { background: #28a745; display: none; }
-        
         .leaderboard { margin-top: 20px; background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); }
         .entry { padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85em; }
-        .score-bold { font-weight: bold; color: #d32f2f; }
-        
-        .cat-label { font-weight: bold; margin-top: 15px; display: block; color: #d32f2f; font-size: 0.9em; border-bottom: 1px solid #d32f2f; padding-bottom: 3px; }
+        .score-info { color: #888; margin-top: 4px; display: block; font-size: 0.82em; line-height: 1.3; }
+        .score-bold { font-weight: bold; color: #d32f2f; display: block; margin-top: 4px; }
+        .cat-label { font-weight: bold; margin-top: 15px; display: block; color: #d32f2f; font-size: 0.9em; }
+        .result-card { text-align: center; padding: 15px; border: 2px solid #d32f2f; border-radius: 10px; background: var(--card-bg); }
         .hidden { display: none !important; }
-        
-        .top-bar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
-        .dark-mode-toggle { width: auto; padding: 8px 12px; font-size: 0.75em; background: #7f8c8d; margin: 0; }
+        .logout-btn { background: #7f8c8d; font-size: 0.75em; padding: 10px; margin-top: 20px; width: auto; display: block; margin-left: auto; margin-right: auto; }
+        .dark-mode-toggle { width: auto; padding: 8px 12px; font-size: 0.75em; background: #555; margin: 0; float: right; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="top-bar">
-        <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌓 Design umschalten</button>
-    </div>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌓 Design umschalten</button>
+    <div style="clear:both;"></div>
 
     <div id="password-area">
         <h2>Feuerwehr Zugang</h2>
-        <input type="password" id="pw-input" placeholder="Passwort..." style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; font-size: 16px;">
+        <input type="password" id="pw-input" placeholder="Passwort..." style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc; font-size: 16px;">
         <button onclick="checkPassword()">Einloggen</button>
     </div>
 
     <div id="login-area" class="hidden">
         <h2 id="portal-title">Feuerwehr Login</h2>
-        <input type="text" id="user-name" placeholder="Dein Name..." style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; font-size: 16px;">
+        <input type="text" id="user-name" placeholder="Dein Name..." style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc; font-size: 16px;">
         
         <div id="menu">
             <span class="cat-label">1. MANNSCHAFT (90 FRAGEN)</span>
@@ -103,11 +91,8 @@
             <button class="exam-btn" onclick="preStart('gruppenfuehrer', 'exam')">⏱ Prüfungssimulation (30 Fr.)</button>
 
             <hr style="border:0; border-top:1px solid #ddd; margin: 20px 0;">
-            <div class="part-row">
-                <button style="background: #2c3e50;" onclick="showGlobalLeaderboard('learning')">🏆 Lern-Ranking</button>
-                <button style="background: #8e44ad;" onclick="showGlobalLeaderboard('exam')">⭐ Prüfungs-Ranking</button>
-            </div>
-            <button class="menu-btn" style="margin-top: 15px; background:#666;" onclick="logout()">Abmelden</button>
+            <button style="background: #2c3e50;" onclick="showGlobalLeaderboard()">🏆 Bestenliste ansehen</button>
+            <button class="logout-btn" onclick="logout()">Abmelden (Zurück zum Login)</button>
         </div>
     </div>
 
@@ -120,18 +105,18 @@
             <div id="feedback"></div>
             <button id="next-btn" onclick="nextQuestion()">Nächste Frage</button>
         </div>
-        <button id="abort-btn" style="background:#666; margin-top:30px;" onclick="confirmAbort()">Abbrechen</button>
+        <button id="abort-btn" style="background:#666; margin-top:30px;" onclick="confirmAbort()">Abbrechen / Menü</button>
     </div>
 
     <div id="leaderboard-view" style="display:none;">
-        <h2 id="lb-headline">🏆 Bestenliste</h2>
+        <h2 id="leaderboard-title">🏆 Gesamt-Bestenliste</h2>
         <div id="leaderboard-list">Lade Daten...</div>
-        <button style="background:#444; margin-top: 20px;" onclick="backToMenu()">Zurück zum Menü</button>
+        <button style="background:#444;" onclick="backToMenu()">Zurück zum Menü</button>
     </div>
 </div>
 
 <script>
-    // --- FIREBASE CONFIG ---
+    // --- FIREBASE KONFIGURATION ---
     const firebaseConfig = {
         apiKey: "AIzaSyCs_FBU4LD6SWrNqgTEJgYV_RpP5R_W0IE",
         databaseURL: "https://las-gold-default-rtdb.europe-west1.firebasedatabase.app/",
@@ -143,7 +128,9 @@
     const PW_HEDDESHEIM = "68542";
     const PW_SCHRIESHEIM = "06220";
 
-    // --- HIER DEINE FRAGEN EINTRAGEN ---
+    // ############################################################
+    // ### HIER DEINE FRAGEN EINTRAGEN                          ###
+    // ############################################################
     const catalogs = {
         mannschaft: [{ id: 1, q: " Wer ist nach dem Feuerwehrgesetz Baden-Württemberg für die Aufstellung, Ausrüstung und Unterhaltung der Feuerwehr verantwortlich?", o: {a: "Bund", b: "Land", c: "Kreis", d: "Gemeinde", e: "Kommandant"}, a: ["d"] },
         { id: 2, q: " Welches sind Rechtsgrundlagen der Feuerwehr?", o: {a: "Bürgerliches Gesetzbuch", b: "Feuerwehrgesetz Baden-Württemberg", c: "Feuerwehrsatzung der Gemeinde", d: "Landesverfassung Baden-Württemberg"}, a: ["b", "c"] },
@@ -359,17 +346,18 @@
         { id: 60, q: " Bereiche mit ABC-Gefahrstoffen werden bei der Einsatzvorbereitung entsprechend den auszu-\nführenden Maßnahmen in drei Gefahrengruppen eingeteilt. Welche Zuordnung ist richtig?", o: {a: "Gefahrengruppe I - Bereiche, in denen die Einsatzkräfte nur mit Sonderausrüstung und unter besonderer Über-\nwachung und Dekontamination/Hygiene tätig werden dürfen", b: "Gefahrengruppe II - Bereiche, in denen die Einsatzkräfte ohne Sonderausrüstung tätig werden dürfen. Zur\nVermeidung einer Inkorporation soll jedoch Atemschutz getragen werden", c: "Gefahrengruppe III - Bereiche, in denen Einsatzkräfte nur mit Sonderausrüstung und unter besonderer Über-\nnwachung und Dekontamination/Hygiene tätig werden dürfen und deren Eigenart die Anwesenheit einer fach-\nkundigen Person notwendig macht, die während des Einsatzes die entstehende Gefährdung und die anzuwen-\ndenden Schutzmaßnahmen beurteilen kann"}, a: ["c"] }
         ]
     };
+    // ############################################################
 
     let deviceID = localStorage.getItem("quiz_device_id") || 'dev_' + Math.random().toString(36).substr(2, 9);
     localStorage.setItem("quiz_device_id", deviceID);
-
-    let currentQuestions = [], currentIndex = 0, score = 0, currentPlayer = "", currentCategory = "", currentPart = "";
 
     function toggleDarkMode() {
         document.body.classList.toggle('dark-mode');
         localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
     }
     if(localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+
+    window.onload = () => { if(localStorage.getItem('active_pw')) applyAccess(localStorage.getItem('active_pw')); };
 
     function checkPassword() {
         const input = document.getElementById('pw-input').value;
@@ -385,25 +373,31 @@
         document.getElementById('portal-title').innerText = "Feuerwehr " + (pw === PW_HEDDESHEIM ? "Heddesheim" : "Schriesheim");
     }
 
+    function logout() {
+        if (confirm("Möchtest du dich wirklich abmelden und zum Passwort-Login zurückkehren?")) {
+            localStorage.removeItem('active_pw');
+            location.reload();
+        }
+    }
+
+    let currentQuestions = [], currentIndex = 0, score = 0, currentPlayer = "", currentCategory = "", currentPart = "";
+
     function preStart(key, part) {
         const nameInput = document.getElementById("user-name").value.trim();
-        if (!nameInput) { alert("Bitte gib deinen Namen ein!"); return; }
+        if (!nameInput) { alert("Bitte gib zuerst deinen Namen ein!"); return; }
         currentPlayer = nameInput;
         currentCategory = key;
         currentPart = part;
 
         if (part === 'exam') {
-            // Simulation: 30 zufällige Fragen aus dem gesamten gewählten Katalog
+            // 30 Zufallsfragen aus dem ganzen Katalog
             currentQuestions = [...catalogs[key]].sort(() => 0.5 - Math.random()).slice(0, 30);
         } else {
-            // Normaler Lern-Teil (z.B. Teil 1 = Fragen 1-30)
-            const perPart = 30; 
-            const start = (part - 1) * perPart;
-            currentQuestions = catalogs[key].slice(start, start + perPart);
+            // Teile lernen (1-30, 31-60, etc.)
+            const startIdx = (part - 1) * 30;
+            currentQuestions = catalogs[key].slice(startIdx, startIdx + 30);
         }
 
-        if(currentQuestions.length === 0) { alert("Keine Fragen in diesem Bereich gefunden!"); return; }
-        
         currentIndex = 0; score = 0;
         document.getElementById("login-area").style.display = "none";
         document.getElementById("quiz-area").style.display = "block";
@@ -412,7 +406,7 @@
 
     function showQuestion() {
         const q = currentQuestions[currentIndex];
-        document.getElementById("progress").innerText = `${currentPart === 'exam' ? 'PRÜFUNG' : 'LERNEN'} - Frage ${currentIndex+1}/${currentQuestions.length}`;
+        document.getElementById("progress").innerText = `Frage ${currentIndex+1}/${currentQuestions.length}`;
         document.getElementById("question-display").innerText = q.q;
         let html = "";
         for (let k in q.o) {
@@ -444,64 +438,88 @@
     }
 
     function finishQuiz() {
-        const percent = Math.round((score / currentQuestions.length) * 100);
+        const total = currentQuestions.length;
+        const wrong = total - score;
+        const percent = Math.round((score / total) * 100);
+        const datum = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
         const activePw = localStorage.getItem('active_pw');
-        const dbPath = currentPart === 'exam' ? 'exams' : 'learning';
 
-        // In Firebase speichern
-        database.ref(`${dbPath}/${activePw}/${currentCategory}/${deviceID}`).set({
-            name: currentPlayer,
-            score: percent,
-            date: new Date().toLocaleString('de-DE', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})
-        });
-
+        document.getElementById("progress").style.display = "none";
+        document.getElementById("abort-btn").style.display = "none";
         document.getElementById("quiz-box").innerHTML = `
-            <div style="text-align:center; padding:20px; border:3px solid #d32f2f; border-radius:15px; background: var(--card-bg);">
-                <h2>Ergebnis</h2>
-                <div style="font-size:3.5em; font-weight:bold; color:${percent >= 50 ? '#28a745' : '#d32f2f'}">${percent}%</div>
-                <p>${score} von ${currentQuestions.length} Fragen richtig.</p>
-                <button onclick="location.reload()">Zurück zum Hauptmenü</button>
+            <div class="result-card">
+                <h3>Ergebnis: ${currentPart === 'exam' ? 'Prüfung' : 'Teil ' + currentPart}</h3>
+                <p style="font-size: 1.2em; margin: 10px 0;">
+                    ✅ Richtig: <b>${score}</b><br>
+                    ❌ Falsch: <b>${wrong}</b>
+                </p>
+                <div style="font-size: 2.5em; font-weight: bold; color: ${percent >= 50 ? '#28a745' : '#d32f2f'}; margin: 15px 0;">
+                    ${percent}%
+                </div>
+                <p style="color: #888; font-size: 0.8em;">Ergebnis wurde gespeichert.</p>
+                <button onclick="showGlobalLeaderboard()">Zur Bestenliste</button>
+                <button style="background:#666; margin-top:10px;" onclick="location.reload()">Zum Hauptmenü</button>
             </div>
         `;
-        document.getElementById("abort-btn").classList.add("hidden");
-        document.getElementById("progress").classList.add("hidden");
+
+        // Speichern unter Beibehaltung der alten Struktur
+        const userRef = database.ref(`leaderboard/${deviceID}/${currentCategory}`);
+        userRef.once('value', (snapshot) => {
+            let data = snapshot.val() || { name: currentPlayer, room: activePw };
+            if(!data.counts) data.counts = {t1:0, t2:0, t3:0, exam:0};
+            if(!data.dates) data.dates = {t1:'', t2:'', t3:'', exam:''};
+            if(!data.lasts) data.lasts = {t1:0, t2:0, t3:0, exam:0}; 
+            
+            const key = currentPart === 'exam' ? 'exam' : 't' + currentPart;
+            data[key] = Math.max(data[key] || 0, percent);
+            data.counts[key] = (data.counts[key] || 0) + 1;
+            data.dates[key] = datum;
+            data.lasts[key] = percent;
+            
+            const div = (currentCategory === 'mannschaft') ? 3 : 2;
+            data.total = Math.round(((data.t1 || 0) + (data.t2 || 0) + (data.t3 || 0)) / div);
+            userRef.set(data);
+        });
     }
 
-    function showGlobalLeaderboard(type) {
+    function showGlobalLeaderboard() {
         const activePw = localStorage.getItem('active_pw');
         document.getElementById("login-area").style.display = "none";
+        document.getElementById("quiz-area").style.display = "none";
         document.getElementById("leaderboard-view").style.display = "block";
-        document.getElementById("lb-headline").innerText = type === 'exam' ? "⭐ Prüfungs-Ranking" : "📚 Lern-Ranking";
-
-        database.ref(`${type}/${activePw}`).once('value', (snapshot) => {
-            const data = snapshot.val();
+        
+        database.ref('leaderboard').once('value', (snapshot) => {
+            const allData = snapshot.val();
             let html = "";
             ['mannschaft', 'maschinist', 'gruppenfuehrer'].forEach(cat => {
                 html += `<div class="leaderboard"><h3>🚒 ${cat.toUpperCase()}</h3>`;
-                if (!data || !data[cat]) {
-                    html += "<p style='font-size:0.8em; opacity:0.6;'>Noch keine Einträge.</p></div>";
-                    return;
+                let entries = [];
+                for (let id in allData) { 
+                    if (allData[id][cat] && allData[id][cat].room === activePw) entries.push(allData[id][cat]);
                 }
-                let entries = Object.values(data[cat]).sort((a, b) => b.score - a.score);
-                entries.forEach((e, i) => {
-                    html += `<div class="entry"><b>${i+1}. ${e.name}</b>: <span class="score-bold">${e.score}%</span> <br><small>${e.date}</small></div>`;
+                entries.sort((a, b) => b.total - a.total).forEach((e, i) => {
+                    html += `<div class="entry"><b>${i+1}. ${e.name}</b><br>`;
+                    [1, 2, 3].forEach(p => {
+                        if(cat !== 'mannschaft' && p === 3) return;
+                        const d = (e.dates && e.dates['t'+p]) ? e.dates['t'+p] : '-';
+                        const c = (e.counts && e.counts['t'+p]) ? e.counts['t'+p] : 0;
+                        const s = e['t'+p] || 0;
+                        const last = (e.lasts && e.lasts['t'+p] !== undefined) ? e.lasts['t'+p] : '-';
+                        html += `<span class="score-info">Teil ${p}: Best: ${s}% | Letztes: ${last}% (${c} Versuche, am ${d})</span>`;
+                    });
+                    const examBest = e.exam || 0;
+                    const examLast = e.lasts && e.lasts.exam !== undefined ? e.lasts.exam : '-';
+                    html += `<span class="score-info" style="color:#e67e22">Prüfung: Best: ${examBest}% | Letzte: ${examLast}%</span>`;
+                    html += `<span class="score-bold">Gesamt-Schnitt: ${e.total || 0}%</span></div>`;
                 });
-                html += "</div>";
+                html += `</div>`;
             });
             document.getElementById("leaderboard-list").innerHTML = html;
         });
     }
 
-    function backToMenu() {
-        document.getElementById("leaderboard-view").style.display = "none";
-        document.getElementById("login-area").style.display = "block";
-    }
-
-    function logout() { if(confirm("Abmelden?")) { localStorage.removeItem('active_pw'); location.reload(); } }
-    function confirmAbort() { if(confirm("Abbrechen? Dein Fortschritt wird nicht gespeichert.")) location.reload(); }
-
-    window.onload = () => { if(localStorage.getItem('active_pw')) applyAccess(localStorage.getItem('active_pw')); };
+    function backToMenu() { document.getElementById("leaderboard-view").style.display = "none"; document.getElementById("login-area").style.display = "block"; }
+    function confirmAbort() { if (confirm("Quiz wirklich abbrechen? Fortschritt wird nicht gespeichert.")) location.reload(); }
 </script>
-
 </body>
 </html>

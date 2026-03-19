@@ -399,7 +399,6 @@
         ]
     };
 
-    // --- GERÄTE-ID GENERIEREN (Wichtig für Namen-Update) ---
     function getDeviceId() {
         let id = localStorage.getItem('quiz_device_id');
         if (!id) {
@@ -439,11 +438,11 @@
         const val = input.value.trim();
         if(!val) { alert("Bitte Namen eingeben!"); return; }
         
-        // Lokal speichern
+        const oldName = localStorage.getItem("quiz_user_name");
         localStorage.setItem("quiz_user_name", val);
-        
-        // In Datenbank Namen für diese Geräte-ID in allen Kategorien aktualisieren
         const devId = getDeviceId();
+
+        // Bestehende Daten unter diesem Gerät in Firebase aktualisieren
         ['mannschaft', 'maschinist', 'gruppenfuehrer'].forEach(cat => {
             database.ref(`leaderboard/${devId}/${cat}`).update({ name: val });
         });
@@ -539,13 +538,12 @@
 
         document.getElementById("quiz-box").innerHTML = `<div style="text-align:center;"><h3>Ergebnis</h3><div style="font-size: 3em; font-weight: bold; color: ${percent >= 50 ? '#28a745' : '#d32f2f'};">${percent}%</div><button onclick="location.reload()">Hauptmenü</button></div>`;
 
-        // Nutze die Geräte-ID statt den Namen als Datenbank-Key
         const devId = getDeviceId();
         const userRef = database.ref(`leaderboard/${devId}/${currentCategory}`);
         
         userRef.once('value', (snapshot) => {
             let data = snapshot.val() || { name: currentPlayer, room: activePw, devId: devId };
-            data.name = currentPlayer; // Immer den aktuellsten Namen setzen
+            data.name = currentPlayer;
             data.room = activePw;
             if(!data.counts) data.counts = {t1:0, t2:0, t3:0, exam:0};
             if(!data.dates) data.dates = {t1:'', t2:'', t3:'', exam:''};
@@ -571,7 +569,7 @@
         database.ref('leaderboard').once('value', (snapshot) => {
             const rawData = snapshot.val();
             let html = "";
-
+            
             const parseDate = (str) => {
                 if(!str || str === '-' || str === '') return 0;
                 try {
@@ -584,16 +582,38 @@
 
             ['mannschaft', 'maschinist', 'gruppenfuehrer'].forEach(cat => {
                 html += `<div class="leaderboard"><h3>🚒 ${cat.toUpperCase()}</h3>`;
-                let entries = [];
+                let mergedEntries = {};
 
                 for (let id in rawData) {
                     const entry = rawData[id][cat];
                     if (entry && entry.room === activePw) {
-                        entries.push(entry);
+                        // Wir mergen hier zusätzlich nach Namen, falls jemand auf 2 Geräten den gleichen Namen nutzt
+                        const nameKey = entry.name.toLowerCase().trim();
+                        if (!mergedEntries[nameKey]) {
+                            mergedEntries[nameKey] = JSON.parse(JSON.stringify(entry));
+                        } else {
+                            const me = mergedEntries[nameKey];
+                            ['t1', 't2', 't3', 'exam'].forEach(k => {
+                                me[k] = Math.max(me[k] || 0, entry[k] || 0);
+                                if(!me.counts) me.counts = {t1:0, t2:0, t3:0, exam:0};
+                                me.counts[k] = (me.counts[k] || 0) + (entry.counts ? (entry.counts[k] || 0) : 0);
+                                
+                                const existingDateVal = parseDate(me.dates ? me.dates[k] : '-');
+                                const newDateVal = parseDate(entry.dates ? entry.dates[k] : '-');
+                                if (newDateVal > existingDateVal) {
+                                    if(!me.dates) me.dates = {};
+                                    if(!me.lasts) me.lasts = {};
+                                    me.dates[k] = entry.dates[k];
+                                    me.lasts[k] = entry.lasts[k];
+                                }
+                            });
+                            const div = (cat === 'mannschaft') ? 3 : 2;
+                            me.total = Math.round(((me.t1 || 0) + (me.t2 || 0) + (me.t3 || 0)) / div);
+                        }
                     }
                 }
 
-                entries.sort((a, b) => b.total - a.total).forEach((e, i) => {
+                Object.values(mergedEntries).sort((a, b) => b.total - a.total).forEach((e, i) => {
                     html += `<div class="entry"><b>${i+1}. ${e.name}</b><br>`;
                     [1, 2, 3].forEach(p => {
                         if(cat !== 'mannschaft' && p === 3) return;
@@ -622,3 +642,4 @@
 </script>
 </body>
 </html>
+

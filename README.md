@@ -379,16 +379,21 @@
         ]
     };
 
-    let deviceID = localStorage.getItem("quiz_device_id") || 'dev_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem("quiz_device_id", deviceID);
-
     function toggleDarkMode() {
         document.body.classList.toggle('dark-mode');
         localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
     }
     if(localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
 
-    window.onload = () => { if(localStorage.getItem('active_pw')) applyAccess(localStorage.getItem('active_pw')); };
+    window.onload = () => { 
+        if(localStorage.getItem('active_pw')) applyAccess(localStorage.getItem('active_pw')); 
+        
+        // Gespeicherten Namen beim Laden wieder ins Feld eintragen
+        const savedName = localStorage.getItem("quiz_user_name");
+        if(savedName) {
+            document.getElementById("user-name").value = savedName;
+        }
+    };
 
     function checkPassword() {
         const input = document.getElementById('pw-input').value;
@@ -416,6 +421,10 @@
     function preStart(key, part) {
         const nameInput = document.getElementById("user-name").value.trim();
         if (!nameInput) { alert("Bitte gib deinen Namen ein!"); return; }
+        
+        // Name dauerhaft im Browser merken
+        localStorage.setItem("quiz_user_name", nameInput);
+        
         currentPlayer = nameInput;
         currentCategory = key;
         currentPart = part;
@@ -482,9 +491,17 @@
             </div>
         `;
 
-        const userRef = database.ref(`leaderboard/${deviceID}/${currentCategory}`);
+        // ID aus dem Namen erstellen (kleingeschrieben, ohne Leerzeichen) für geräteübergreifende Liste
+        const nameId = currentPlayer.toLowerCase().replace(/\s+/g, '');
+        const userRef = database.ref(`leaderboard/${nameId}/${currentCategory}`);
+        
         userRef.once('value', (snapshot) => {
             let data = snapshot.val() || { name: currentPlayer, room: activePw };
+            
+            // Sicherstellen, dass der Anzeigename und Raum aktuell bleiben
+            data.name = currentPlayer;
+            data.room = activePw;
+
             if(!data.counts) data.counts = {t1:0, t2:0, t3:0, exam:0};
             if(!data.dates) data.dates = {t1:'', t2:'', t3:'', exam:''};
             if(!data.lasts) data.lasts = {t1:0, t2:0, t3:0, exam:0}; 

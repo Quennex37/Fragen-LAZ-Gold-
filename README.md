@@ -86,6 +86,10 @@
         .hidden { display: none !important; }
         .logout-btn { background: transparent; color: #888; font-size: 0.8em; text-decoration: underline; margin-top: 20px; padding: 5px; }
         .dark-mode-toggle { width: auto; padding: 6px 12px; font-size: 0.75em; background: #555; position: absolute; right: 15px; top: 15px; border-radius: 20px; }
+        
+        /* Neuer Style für den Namen-Ändern Button */
+        .name-edit-container { display: flex; gap: 5px; margin-bottom: 15px; }
+        .name-edit-btn { background: #666; font-size: 0.7em; padding: 10px; width: auto; margin-top: 0; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -101,7 +105,11 @@
 
     <div id="login-area" class="hidden">
         <h2 id="portal-title" style="margin-top: 25px;">Hauptmenü</h2>
-        <input type="text" id="user-name" placeholder="Dein Vorname..." style="width:100%; padding:15px; margin-bottom:15px; border-radius:10px; border:1px solid #ccc; font-size: 16px;">
+        
+        <div class="name-edit-container">
+            <input type="text" id="user-name" placeholder="Dein Vorname..." readonly style="flex-grow:1; padding:15px; border-radius:10px; border:1px solid #ccc; font-size: 16px; background: #eee;">
+            <button class="name-edit-btn" id="edit-btn" onclick="enableNameChange()">Namen ändern</button>
+        </div>
         
         <div id="menu">
             <span class="cat-label">Mannschaft (90 Fragen)</span>
@@ -388,12 +396,35 @@
     window.onload = () => { 
         if(localStorage.getItem('active_pw')) applyAccess(localStorage.getItem('active_pw')); 
         
-        // Gespeicherten Namen beim Laden wieder ins Feld eintragen
         const savedName = localStorage.getItem("quiz_user_name");
         if(savedName) {
             document.getElementById("user-name").value = savedName;
+        } else {
+            // Wenn kein Name da ist, Eingabe erlauben
+            enableNameChange();
         }
     };
+
+    function enableNameChange() {
+        const input = document.getElementById("user-name");
+        input.readOnly = false;
+        input.style.background = "#fff";
+        input.focus();
+        document.getElementById("edit-btn").innerText = "Speichern";
+        document.getElementById("edit-btn").onclick = saveName;
+    }
+
+    function saveName() {
+        const input = document.getElementById("user-name");
+        const val = input.value.trim();
+        if(!val) { alert("Bitte Namen eingeben!"); return; }
+        
+        localStorage.setItem("quiz_user_name", val);
+        input.readOnly = true;
+        input.style.background = "#eee";
+        document.getElementById("edit-btn").innerText = "Namen ändern";
+        document.getElementById("edit-btn").onclick = enableNameChange;
+    }
 
     function checkPassword() {
         const input = document.getElementById('pw-input').value;
@@ -422,7 +453,7 @@
         const nameInput = document.getElementById("user-name").value.trim();
         if (!nameInput) { alert("Bitte gib deinen Namen ein!"); return; }
         
-        // Name dauerhaft im Browser merken
+        // Falls man im "Ändern"-Modus startet, speichern wir den Namen jetzt
         localStorage.setItem("quiz_user_name", nameInput);
         
         currentPlayer = nameInput;
@@ -491,14 +522,13 @@
             </div>
         `;
 
-        // ID aus dem Namen erstellen (kleingeschrieben, ohne Leerzeichen) für geräteübergreifende Liste
+        // ID aus dem Namen erstellen für geräteübergreifende Liste (z.B. "dana")
         const nameId = currentPlayer.toLowerCase().replace(/\s+/g, '');
         const userRef = database.ref(`leaderboard/${nameId}/${currentCategory}`);
         
         userRef.once('value', (snapshot) => {
             let data = snapshot.val() || { name: currentPlayer, room: activePw };
             
-            // Sicherstellen, dass der Anzeigename und Raum aktuell bleiben
             data.name = currentPlayer;
             data.room = activePw;
 
@@ -507,7 +537,9 @@
             if(!data.lasts) data.lasts = {t1:0, t2:0, t3:0, exam:0}; 
             
             const key = currentPart === 'exam' ? 'exam' : 't' + currentPart;
+            // Bestwert speichern
             data[key] = Math.max(data[key] || 0, percent);
+            // Versuche hochzählen (wichtig für PC + Handy Kombi)
             data.counts[key] = (data.counts[key] || 0) + 1;
             data.dates[key] = datum;
             data.lasts[key] = percent;
